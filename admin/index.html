@@ -68,7 +68,7 @@
             // };
             // xhr.send();
 
-
+            // jQuery的方式获取token
             $.ajax({
                 type: 'get',
                 url: "http://localhost:8080/api/v1/admin/user/info",
@@ -83,6 +83,16 @@
                         $('.user_center_link>img').attr('src', backData.data.userPic);
                     };
                 }
+            });
+
+            // 需求二：
+            // 给退出按钮创建一个点击事件
+            // 点击后移除掉localStorage的属性值-token
+            $('.logout').on('click', function() {
+                localStorage.removeItem('token');
+                if (confirm('你确定退出吗？')) {
+                    window.location.href = './login.html';
+                };
             });
         });
     </script>
