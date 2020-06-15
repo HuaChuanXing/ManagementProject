@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>文章列表</title>
+    <title>用户信息修改</title>
     <link rel="stylesheet" href="./libs/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/iconfont.css">
@@ -56,8 +56,7 @@
                 <div class="form-group">
                     <label for="inputEmail4" class="col-sm-2 control-label">密码：</label>
                     <div class="col-sm-4">
-                        <input type="password" name="password" class="form-control password" id="inputEmail4"
-                            value="12345678">
+                        <input type="password" name="password" class="form-control password" id="inputEmail4" value="12345678">
                     </div>
                 </div>
                 <div class="form-group">
@@ -68,6 +67,75 @@
             </form>
         </div>
     </div>
+
+    <!-- 引入url地址文件 -->
+    <script src="./libs/https.js"></script>
+    <script>
+        $(function() {
+            // 思路分析
+            // 需求一：
+            // 1.一加载页面，就将用户的信息获取，然后将获取到的值设置给对应的位置
+            // 2.发送ajax请求，请求用户详情信息
+            // 3.将获取到的数据，赋值给对应的位置
+            $.ajax({
+                type: 'get',
+                url: BigNew.user_detail,
+                success: function(backData) {
+                    // console.log(backData);
+                    // 请求成功后
+                    if (backData.code == 200) {
+                        $('#inputEmail1').val(backData.data.username); //用户名
+                        $('#inputEmail2').val(backData.data.nickname); //昵称
+                        $('#inputEmail3').val(backData.data.email); //邮箱
+                        $('#inputEmail4').val(backData.data.password); //密码
+                        $('.user_pic').attr('src', backData.data.userPic); //头像
+                    };
+                }
+            });
+
+            // 需求二：
+            // 1.给修改按钮创建点击事件
+            // 2.创建FormData对象
+            // 3.发送ajax请求
+            // 4.请求成功后，刷新页面
+
+            // 1.给修改按钮创建点击事件
+            $('.btn-edit').on('click', function(e) {
+                // 取消submit按钮的默认行为
+                e.preventDefault();
+                // 2.创建FormData对象
+                var fd = new FormData($('#form')[0]);
+                // 3.发送ajax请求
+                $.ajax({
+                    type: 'post',
+                    url: BigNew.user_edit,
+                    data: fd,
+                    contentType: false,
+                    processData: false,
+                    success: function(backData) {
+                        // 4.请求成功后，刷新页面
+                        console.log(backData);
+                        if (backData.code == 200) {
+                            alert('修改成功');
+                            // location.href = './index.html';
+                            location.reload();
+                        };
+                    }
+                });
+            });
+
+            // 需求三：
+            // 1.给添加文件的表单创建一个值改变事件
+            $('#exampleInputFile').on('change', function() {
+                // 2.获取到这个选中的文件
+                var file = this.files[0];
+                // 3.给这个文件创建一个路径
+                var url = URL.createObjectURL(file);
+                // 4.将这个创建的路径给要显示的img标签
+                $('.user_pic').attr('src', url);
+            });
+        });
+    </script>
 </body>
 
 </html>
