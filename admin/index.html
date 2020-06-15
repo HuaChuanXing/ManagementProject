@@ -17,7 +17,7 @@
 
 <body>
     <div class="sider">
-        <a href="./user.html" target="main_frame" class="logo"><img src="images/logo02.png" alt="logo"></a>
+        <a href="#" class="logo"><img src="images/logo02.png" alt="logo"></a>
         <div class="user_info">
             <img src="images/2.jpg" alt="person">
             <span>欢迎&nbsp;&nbsp;<i>李思思</i></span>
@@ -25,13 +25,16 @@
         </div>
         <!-- 左侧导航栏 -->
         <div class="menu">
+            <!-- 首页 -->
             <div class="level01 active">
                 <a href="./main_count.html" target="main_frame">
                     <i class="iconfont icon-yidiandiantubiao04"></i>
                     <span>首页</span>
                 </a>
             </div>
-            <div class="level01">
+
+            <!-- 文章管理 -->
+            <div class="level01" id="showLi">
                 <a href="./article_edit.html" target="main_frame">
                     <i class="iconfont icon-icon-article"></i>
                     <span>文章管理</span>
@@ -54,12 +57,15 @@
                 </li>
             </ul>
 
+            <!-- 评论管理 -->
             <div class="level01">
                 <a href="./comment_list.html" target="main_frame">
                     <i class="iconfont icon-comment"></i>
                     <span>评论管理</span>
                 </a>
             </div>
+
+            <!-- 个人中心 -->
             <div class="level01" id="user">
                 <a href="./user.html" target="main_frame">
                     <i class="iconfont icon-user"></i>
@@ -123,6 +129,32 @@
                 if (confirm('你确定退出吗？')) {
                     window.location.href = './login.html';
                 };
+            });
+
+            // 需求三：
+            // 点击左侧导航栏的菜单项，点击的菜单项就会变色，其他的兄弟项则不变色
+            // 1.给menu子元素带有level01类的元素创建点击事件
+            // 2.排他思想修改样式
+            $('.menu .level01').on('click', function() {
+                $(this).addClass('active').siblings().removeClass('active');
+            });
+
+            // 需求三：
+            $('#showLi').on('click', function() {
+                if ($('.level02').css('display') == 'none') {
+                    // 如果ul是隐藏的，就让ul显示出来
+                    $('.level02').show();
+                    // 同时将箭头的旋转角度
+                    $('#showLi>a>b')[0].style.transform = 'rotate(0deg)';
+                } else {
+                    $('.level02').hide();
+                    $('#showLi>a>b')[0].style.transform = 'rotate(90deg)';
+                };
+            });
+            // 给level02下的li标签创建点击事件
+            // 使用排他思想修改样式
+            $('.level02 li').on('click', function() {
+                $(this).addClass('active').siblings().removeClass('active');
             });
         });
     </script>
