@@ -144,7 +144,9 @@
             // 1.给menu子元素带有level01类的元素创建点击事件
             // 2.排他思想修改样式
             $('.menu .level01').on('click', function() {
-                $(this).addClass('active').siblings().removeClass('active');
+                $(this).addClass('active').siblings('div').removeClass('active');
+                // 给ul中的第一个li触发点击事件
+                $('.level02 li').first().trigger('click');
             });
 
             // 需求三：
@@ -164,6 +166,7 @@
             $('.level02 li').on('click', function() {
                 $(this).addClass('active').siblings().removeClass('active');
             });
+
         });
     </script>
 </body>
