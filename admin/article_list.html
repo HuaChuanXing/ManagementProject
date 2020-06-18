@@ -11,8 +11,11 @@
     <link rel="stylesheet" href="./css/iconfont.css">
     <link rel="stylesheet" href="./css/main.css">
     <script src="./libs/jquery-1.12.4.min.js"></script>
+    <script src="./libs/bootstrap/js/bootstrap.min.js"></script>
     <!-- 引入模板引擎js文件 -->
     <script src="./libs/template-web.js"></script>
+    <!-- 引入分页插件 -->
+    <script src="./libs/jquery.twbsPagination.js"></script>
 </head>
 
 <body>
@@ -69,9 +72,151 @@
                 </tbody>
             </table>
             <div class="row text-center">
+                <!-- 分页结构 -->
+                <ul class="pagination" id="pagination"></ul>
+                <p style="display: none;">没有数据</p>
             </div>
         </div>
     </div>
+
+    <!-- 准备模板结构 -->
+    <script type="text/html" id="articleList">
+        {{each data.data v}}
+        <tr>
+            <td>{{v.title}}</td>
+            <td>{{v.author}}</td>
+            <td>{{v.category}}</td>
+            <td class="text-center">{{v.date}}</td>
+            <td class="text-center">{{v.state}}</td>
+            <td class="text-center">
+                <a href="article_edit.html" class="btn btn-default btn-xs">编辑</a>
+                <a href="javascript:void(0);" data-id="{{v.id}}" class="btn btn-danger btn-xs delete">删除</a>
+            </td>
+        </tr>
+        {{/each}}
+    </script>
+
+    <!-- 准备文章类别模板结构 -->
+    <script type="text/html" id="categoryList">
+        <option value>所有的类别</option>
+        {{each data v}}
+        <option value='{{v.id}}'>{{v.name}}</option>
+        {{/each}}
+    </script>
+
+    <script src="./libs/https.js"></script>
+    <script>
+        $(function() {
+            // 思路分析：
+            // 需求一：
+            // 发送ajax，将所有的文章类别显示在所有分类列表中
+            $.ajax({
+                type: "get",
+                url: BigNew.category_list,
+                success: function(backData) {
+                    // console.log(backData);
+                    if (backData.code == 200) {
+                        var resHtml = template('categoryList', backData);
+                        $('#selCategory').html(resHtml);
+                    };
+                }
+            });
+
+            var currentPage; //创建一个变量来存储当前页
+            function getData(myPage, callBack) {
+                $.ajax({
+                    type: 'get',
+                    url: BigNew.article_query,
+                    data: {
+                        type: $('#selCategory').val().trim(), //文章类型id
+                        state: $('#selStatus').val().trim(), //文章状态
+                        perpage: 3, //每页显示条数，为空则默认显示6条
+                        page: myPage //当前页，为空返回第1页
+                    },
+                    success: function(backData) {
+                        console.log(backData);
+                        if (backData.code == 200) {
+                            // 调用模板引擎的核心方法
+                            var resHtml = template('articleList', backData);
+                            $('tbody').html(resHtml);
+
+                            // 文章数量不为0，并且fn函数不为空的时候执行
+                            if ((backData.data.data.length != 0) && (callBack != null)) {
+                                $('#pagination').show().next().hide();
+                                // 执行callBack函数
+                                callBack(backData);
+                            } else if (backData.data.data.length == 0 && currentPage == 1) {
+                                $('#pagination').hide().next().show();
+                            } else if (backData.data.data.length == 0 && backData.data.totalPage == currentPage - 1) {
+                                currentPage -= 1;
+                                // 重新调用一下分页插件
+                                $('#pagination').twbsPagination('changeTotalPages', backData.data.totalPage, currentPage);
+                            };
+                        };
+                    }
+                });
+            };
+
+            // 需求二：
+            // 页面一加载，就将所有的文章和分页插件显示在页面上，默认显示第一页
+            getData(1, function(backData) {
+                $('#pagination').twbsPagination({
+                    totalPages: backData.data.totalPage, //页数
+                    visiblePages: 7, //可见页数上限
+                    startPage: 1, //一加载显示的当前页面
+                    first: '首页',
+                    last: '尾页',
+                    prev: '上一页',
+                    next: '下一页',
+                    onPageClick: function(event, page) {
+                        currentPage = page;
+                        getData(page, null);
+                    }
+                });
+            });
+
+            // 需求三：
+            // 给筛选按钮创建点击事件，获取到文章类别和状态来筛选文章
+            $('#btnSearch').on('click', function(e) {
+                // 取消按钮的默认行为
+                e.preventDefault();
+                // 点击后，让页码变成1
+                currentPage = 1;
+                getData(1, function(backData) {
+                    // 重新调用一下分页插件
+                    $('#pagination').twbsPagination('changeTotalPages', backData.data.totalPage, 1);
+                });
+            });
+
+            // 需求四：
+            // 给删除按钮创建点击事件
+            $('tbody').on('click', 'a.delete', function(e) {
+                // 取消事件的默认行为
+                e.preventDefault();
+                if (confirm('确定删除吗？')) {
+                    // 获取到文章的id
+                    var articleId = $(this).attr('data-id');
+                    $.ajax({
+                        type: 'post',
+                        url: BigNew.article_delete,
+                        data: {
+                            id: articleId
+                        },
+                        success: function(backData) {
+                            // console.log(backData);
+                            if (backData.code == 204) {
+                                // 重新调用ajax方法获取内容
+                                getData(currentPage, function(backData) {
+                                    // 重新调用一下分页插件
+                                    $('#pagination').twbsPagination('changeTotalPages', backData.data.totalPage, currentPage);
+                                });
+                            };
+                        }
+                    });
+                };
+            });
+        });
+    </script>
 </body>
 
 </html>

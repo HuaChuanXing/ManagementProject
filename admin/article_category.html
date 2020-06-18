@@ -159,9 +159,9 @@
                         },
                         success: function(backData) {
                             if (backData.code == 201) {
-                                alert('创建成功！');
                                 // 手动关闭模态框
                                 $('#myModal').modal('hide');
+                                alert('创建成功！');
                                 // 刷新局部内容
                                 getData();
                                 // 清空输入框的内容
@@ -187,9 +187,9 @@
                         },
                         success: function(backData) {
                             if (backData.code == 200) {
-                                alert('修改成功！');
                                 // 手动关闭模态框
                                 $('#myModal').modal('hide');
+                                alert('修改成功！');
                                 // 刷新局部内容
                                 getData();
                                 // 清空输入框的内容
@@ -226,9 +226,9 @@
                     },
                     success: function(backData) {
                         if (backData.code == 204) {
-                            alert('删除成功！');
                             // 手动关闭模态框
                             $('#myModal').modal('hide');
+                            alert('删除成功！');
                             // 刷新局部内容
                             getData();
                         };
