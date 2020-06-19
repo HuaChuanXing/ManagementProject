@@ -89,29 +89,29 @@
             <td class="text-center">{{v.date}}</td>
             <td class="text-center">{{v.state}}</td>
             <td class="text-center">
-                <a href="article_edit.html" class="btn btn-default btn-xs">编辑</a>
-                <a href="javascript:void(0);" data-id="{{v.id}}" class="btn btn-danger btn-xs delete">删除</a>
+                <a href="./article_edit.html?id={{v.id}} class=" btn btn-default btn-xs ">编辑</a>
+                <a href="javascript:void(0); " data-id="{{v.id}} " class="btn btn-danger btn-xs delete ">删除</a>
             </td>
         </tr>
         {{/each}}
     </script>
 
     <!-- 准备文章类别模板结构 -->
-    <script type="text/html" id="categoryList">
+    <script type="text/html " id="categoryList ">
         <option value>所有的类别</option>
         {{each data v}}
         <option value='{{v.id}}'>{{v.name}}</option>
         {{/each}}
     </script>
 
-    <script src="./libs/https.js"></script>
+    <script src="./libs/https.js "></script>
     <script>
         $(function() {
             // 思路分析：
             // 需求一：
             // 发送ajax，将所有的文章类别显示在所有分类列表中
             $.ajax({
-                type: "get",
+                type: "get ",
                 url: BigNew.category_list,
                 success: function(backData) {
                     // console.log(backData);
@@ -134,7 +134,7 @@
                         page: myPage //当前页，为空返回第1页
                     },
                     success: function(backData) {
-                        console.log(backData);
+                        // console.log(backData);
                         if (backData.code == 200) {
                             // 调用模板引擎的核心方法
                             var resHtml = template('articleList', backData);
@@ -215,6 +215,17 @@
                     });
                 };
             });
+
+            // 需求五：给文章列表中的发表文章按钮创建点击事件，成功跳转后，让首页的左侧导航-发表文章位置高亮显示
+            $('#release_btn').on('click', function() {
+                parent.$('ul.level02 li').eq(1).click();
+            });
+
+            // 需求六：
+            // 给tbody标签委托编辑点击事件
+            // $('tbody').on('click', 'a.btn-xs', function() {
+
+            // });
         });
     </script>
 </body>
