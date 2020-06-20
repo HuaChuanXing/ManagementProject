@@ -272,6 +272,22 @@
         {{/each}}
     </script>
 
+    <!-- 返回的文章 -->
+    <script type="text/html" id="article_list">
+        {{each data.data v}}
+        <div class="common_news_list">
+            <a href="./article.html?id={{v.id}}" class="list_pic"><img src="{{v.cover}}" alt=""></a>
+            <h4><a href="./article.html?id={{v.id}}">{{v.title}} </a></h4>
+            <p>{{v.intro}}</p>
+            <div class="new_info">
+                <span>标签：{{v.category}}&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<i class="fa fa-eye"></i>&nbsp;阅读( {{v.read}}
+                    )&nbsp;&nbsp;&nbsp;<i class="fa fa-commenting"></i>&nbsp;评论( {{v.comments}} )</span>
+                <b>发布于 {{v.date}}</b>
+            </div>
+        </div>
+        {{/each}}
+    </script>
+
     <script>
         $(function() {
             // 思路分析：
@@ -334,6 +350,65 @@
             });
 
 
+            // 需求五：
+            // 获取到首页带过来的参数
+            var value = location.search.split('=');
+            var searchName = value[0];
+            var searchVal = decodeURI(value[1]);
+            if (searchName == '?categoryId') {
+                // 文章类别
+                // 发送ajax请求，获取文章数据
+                $.ajax({
+                    type: 'get',
+                    url: 'http://localhost:8080/api/v1/index/search',
+                    data: {
+                        type: searchVal,
+                        // key: searchVal,
+                        page: 1,
+                        perpage: 6
+                    },
+                    success: function(backData) {
+                        if (backData.code == 200) {
+                            if (backData.data.data.length != 0) {
+                                var resHtml = template('article_list', backData);
+                                $('.left_con').html('<div class="list_title"><h3>' + backData.data.data[0].category + '</h3></div>' + resHtml);
+                            } else {
+                                $('.left_con').append('没有数据！');
+                            };
+                        };
+                    }
+                });
+            } else if (searchName == '?searchTxt') {
+                // 搜索词
+                $.ajax({
+                    type: 'get',
+                    url: 'http://localhost:8080/api/v1/index/search',
+                    data: {
+                        // type: searchVal,
+                        key: searchVal,
+                        page: 1,
+                        perpage: 6
+                    },
+                    success: function(backData) {
+                        console.log(backData);
+                        if (backData.code == 200) {
+                            if (backData.data.data.length != 0) {
+                                var resHtml = template('article_list', backData);
+                                $('.left_con').html('<div class="list_title"><h3>' + searchVal + '</h3></div>' + resHtml);
+                            } else {
+                                $('.left_con').html('没有数据！');
+                            };
+                        };
+                    }
+                });
+            };
+
+
+            // 需求六：
+            // 如果没有获取到首页带过来的参数，就重定向回到首页
+            if (searchName == '') {
+                location.href = './index.html';
+            };
         });
     </script>
 </body>
